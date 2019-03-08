@@ -14,4 +14,8 @@ functions:
       - http: get /superheroes/random
       - http: get /supervillians
       - http: get /supervillians/random
+      - http: get /ascii-faces
+      - http: get /ascii-faces/random
       - http: get /superb-like-words
+      - http: get /robot
+      - http: get /coding-love-gif

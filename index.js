@@ -1,6 +1,8 @@
 const serverless = require("serverless-http");
 const express = require("express");
 var fs = require("fs");
+const axios = require("axios");
+const cheerio = require("cheerio");
 
 const app = express();
 
@@ -72,6 +74,71 @@ app.get("/superb-like-words", function(req, res) {
   res.json({
     result: superbLikeWords
   });
+});
+
+//  ---------------------- RANDOM ASCII FACE ----------------------------- //
+app.get("/ascii-faces", function(req, res) {
+  asciiFaces = JSON.parse(fs.readFileSync("./data/ascii-faces.json", "utf8"));
+
+  res.json({
+    result: asciiFaces
+  });
+});
+
+app.get("/ascii-faces/random", function(req, res) {
+  asciiFaces = JSON.parse(fs.readFileSync("./data/ascii-faces.json", "utf8"));
+  var randomIndex = Math.floor(Math.random() * (asciiFaces.length - 1)) + 0;
+  res.json({
+    result: asciiFaces[randomIndex]
+  });
+});
+
+//  ---------------------- CODING LOVE GIF ----------------------------- //
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function get_coding_love_random_gif() {
+  // rnadomize page number
+  let random_page_number = getRandomInt(1, 10);
+  let page_url = `https://thecodinglove.com/page/${random_page_number}`;
+  // send a request to the coding love page
+  const page = await axios(page_url);
+  // load the page to cheerio to be able to parse it
+  const $ = cheerio.load(page.data);
+  // randomize post number
+  let random_post_number = getRandomInt(1, 4);
+  let title_path = `body > main > div > div > div:nth-child(${2 *
+    random_post_number}) > h1 > a`;
+  let gif_title = $(title_path).text();
+  let gif_link = $(
+    `body > main > div > div > div:nth-child(${2 *
+      random_post_number}) > div.blog-post-content > p > video > object`
+  ).attr("data");
+  // return the title and link to the gif as a json
+  return {
+    title: gif_title,
+    link: gif_link
+  };
+}
+
+app.get("/coding-love-gif", async (req, res) => {
+  const json = await get_coding_love_random_gif();
+
+  res.set("Content-Type", "application/json");
+  res.status(200).send(json);
+});
+
+//  ---------------------- ROBOT RANDOM IMAGE ----------------------------- //
+app.get("/robot", function(req, res) {
+  axios
+    .get("https://robohash.org/hello-world.png", {
+      responseType: "arraybuffer"
+    })
+    .then(function(response) {
+      res.writeHead(200, { "Content-type": "image/png" });
+      res.end(response.data, "Base64");
+    });
 });
 
 module.exports.handler = serverless(app);
