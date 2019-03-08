@@ -85,6 +85,14 @@ app.get("/ascii-faces", function(req, res) {
   });
 });
 
+app.get("/ascii-faces/:id", function(req, res) {
+  asciiFaces = JSON.parse(fs.readFileSync("./data/ascii-faces.json", "utf8"));
+
+  res.json({
+    result: asciiFaces[req.params.id]
+  });
+});
+
 app.get("/ascii-faces/random", function(req, res) {
   asciiFaces = JSON.parse(fs.readFileSync("./data/ascii-faces.json", "utf8"));
   var randomIndex = Math.floor(Math.random() * (asciiFaces.length - 1)) + 0;

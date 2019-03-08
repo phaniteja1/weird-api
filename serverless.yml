@@ -15,6 +15,7 @@ functions:
       - http: get /supervillians
       - http: get /supervillians/random
       - http: get /ascii-faces
+      - http: get /ascii-faces/{id}
       - http: get /ascii-faces/random
       - http: get /superb-like-words
       - http: get /robot
